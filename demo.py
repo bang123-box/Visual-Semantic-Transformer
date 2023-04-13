@@ -66,11 +66,11 @@ def load(model, file, device=None, strict=True):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--config', type=str, default='configs/train_abinet.yaml',
+    parser.add_argument('--config', type=str, default='configs/train_vetnet.yaml',
                         help='path to config file')
     parser.add_argument('--input', type=str, default='figs/test')
     parser.add_argument('--cuda', type=int, default=-1)
-    parser.add_argument('--checkpoint', type=str, default='workdir/train-abinet/best-train-abinet.pth')
+    parser.add_argument('--checkpoint', type=str, default='workdir/vst-f/best-vst-f.pth')
     parser.add_argument('--model_eval', type=str, default='alignment', 
                         choices=['alignment', 'vision', 'language'])
     args = parser.parse_args()
@@ -78,7 +78,7 @@ def main():
     if args.checkpoint is not None: config.model_checkpoint = args.checkpoint
     if args.model_eval is not None: config.model_eval = args.model_eval
     config.global_phase = 'test'
-    config.model_vision_checkpoint, config.model_language_checkpoint = None, None
+
     device = 'cpu' if args.cuda < 0 else f'cuda:{args.cuda}'
 
     Logger.init(config.global_workdir, config.global_name, config.global_phase)
