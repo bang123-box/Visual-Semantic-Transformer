@@ -36,7 +36,7 @@ class VSTModel(Model):
         semantic1 = self.vsalign(visual1)
         visual2, semantic2 = self.interaction(visual1, semantic1)
         semantic3 = self.vsalign(visual2)
-        attn_scores = torch.bmm(semantic2.permute(1,0,2), visual2.permute(1,2,0)).softmax(-1).permute(-1, semantic1.shape[0], 8, 40)
+        attn_scores = torch.bmm(semantic2.permute(1,0,2), visual2.permute(1,2,0)).softmax(-1).reshape(-1, semantic1.shape[0], 8, 40)
         logits1 = self.cls1(semantic2.permute(1,0,2))
         ans1 = self.get_answer(semantic2, logits1, "language")
         logits2 = self.cls2(semantic3.permute(1,0,2))
