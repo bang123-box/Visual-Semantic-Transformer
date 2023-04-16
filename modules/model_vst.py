@@ -36,10 +36,11 @@ class VSTModel(Model):
         semantic1 = self.vsalign(visual1)
         visual2, semantic2 = self.interaction(visual1, semantic1)
         semantic3 = self.vsalign(visual2)
+        attn_scores = torch.bmm(semantic2.permute(1,0,2), visual2.permute(1,2,0)).softmax(-1).permute(-1, semantic1.shape[0], 8, 40)
         logits1 = self.cls1(semantic2.permute(1,0,2))
         ans1 = self.get_answer(semantic2, logits1, "language")
         logits2 = self.cls2(semantic3.permute(1,0,2))
-        ans2 = self.get_answer(semantic3, logits2, "vision")
+        ans2 = self.get_answer(semantic3, logits2, "vision", attn_scores)
         if self.config.name == "vst-f":
             total = self.semantic(semantic2, semantic3)
             total = total.permute(1,0,2).reshape(-1, self.max_length, 2*self.d_model)
@@ -48,10 +49,10 @@ class VSTModel(Model):
             return ans1, ans2, ans3
         return ans1, ans2
     
-    def get_answer(self, features, logits, name):
+    def get_answer(self, features, logits, name, attn_scores=None):
         pt_lengths = self._get_length(logits)
         return {'feature': features, 'logits': logits, 'pt_lengths': pt_lengths,
-                'loss_weight':1.0, 'name': name}
+                'loss_weight':1.0, 'name': name, "attn_scores":attn_scores}
     
 
 
